@@ -1,0 +1,17 @@
+<powershell>
+# Rename computer
+Rename-Computer -NewName "${hostname}" -Force
+
+# Set DNS to point to both DCs
+Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses ("${dc1_private_ip}", "${dc2_private_ip}")
+
+# Join domain
+$domain = "${ad_domain_name}"
+$password = "${admin_password}" | ConvertTo-SecureString -asPlainText -Force
+$username = "$domain\Administrator" 
+$credential = New-Object System.Management.Automation.PSCredential($username,$password)
+Add-Computer -DomainName $domain -Credential $credential -Force
+
+# Restart after domain join
+shutdown /r /t 0
+</powershell>
