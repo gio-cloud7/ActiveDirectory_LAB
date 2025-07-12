@@ -1,0 +1,23 @@
+<powershell>
+# Rename computer
+Rename-Computer -NewName "DC1" -Force
+
+# Install AD DS features
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# Promote to domain controller
+Install-ADDSForest `
+  -DomainName "${ad_domain_name}" `
+  -DomainNetbiosName "${ad_domain_netbios_name}" `
+  -ForestMode "WinThreshold" `
+  -DomainMode "WinThreshold" `
+  -InstallDns:$true `
+  -NoRebootOnCompletion:$false `
+  -Force:$true
+
+# Set DNS to point to itself
+Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses ("127.0.0.1")
+
+# Restart after promotion
+shutdown /r /t 0
+</powershell>
