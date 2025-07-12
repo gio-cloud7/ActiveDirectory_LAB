@@ -24,3 +24,28 @@ Using AWS to create a workstation to run terraform (if one is not already availa
     sudo yum -y install terraform
 
 
+
+
+
+
+
+Clone the template repo to the Terraform directory, then navigate to it
+
+git clone https://github.com/gio-cloud7/ActiveDirectory_LAB.git
+cd ActiveDirectory_LAB
+
+
+5)Prepare Authentication and Access method for Terraform to AWS (Account needed - crate IAM user and then create Access key)
+
+aws configure
+
+Provide Access Key
+Provide Secret Access Key
+Type 'us-east-1' or alternative desired AWS region
+press enter for default
+
+Execute Terraform workflow to deploy
+
+terraform init
+terraform plan
+terraform apply
