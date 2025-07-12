@@ -1,0 +1,26 @@
+<powershell>
+# Rename computer
+Rename-Computer -NewName "DC2" -Force
+
+# Install AD DS features
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# Set DNS to point to DC1
+Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses ("${dc1_private_ip}")
+
+# Wait for DC1 to be ready
+Start-Sleep -Seconds 300
+
+# Promote to additional domain controller
+Install-ADDSDomainController `
+  -DomainName "${ad_domain_name}" `
+  -InstallDns:$true `
+  -NoRebootOnCompletion:$false `
+  -Force:$true
+
+# Set DNS to include itself
+Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses ("127.0.0.1", "${dc1_private_ip}")
+
+# Restart after promotion
+shutdown /r /t 0
+</powershell>
